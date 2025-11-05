@@ -1,0 +1,57 @@
+*stocks.txt* Stocks
+
+==============================================================================
+1. Commands
+
+                                                                      *:Stock*
+:Stock {symbol}
+                Echos simple information about {symbol}.
+
+                                                                    *:StockRT*
+:StockRT
+                Turns the current buffer into a |stock-rt| buffer
+
+==============================================================================
+1.1 The stock-rt Buffer
+                                                                    *stock-rt*
+The stock-rt buffer is a special buffer that is managed by the stocks plugin
+to display current information about a list of stocks.
+
+To start, create a buffer with a list of stocks on their own lines. The number
+of shares can optionally be written after the stock eg: >
+        amd 100
+        aapl 500
+<
+After the list of stocks, draw a line made of "-". The final buffer should
+look something like: >
+        amd 100
+        aapl 500
+        --------------
+<
+Below the line, price and change information will be written for each stock in
+the list.
+
+==============================================================================
+2. API
+
+stocks#quote({quote})
+                Gets information about a stock symbol.
+
+                Parameters: ~
+                  • {quote} (`string`)
+
+                Return: ~
+                  (`dictionary`)
+
+                  Keys: ~
+                    • pc (float): previous close
+                        (you probably want this, not 'o')
+                    • o (float): open price
+                    • t (int): timestamp
+                    • c (float): current price
+                    • d (float): change
+                    • dp (float): % change
+                    • h (float): intraday high
+                    • l (float): intraday low
+
+vim:tw=78:ts=8:noet:ft=help:norl:sw=8:expandtab

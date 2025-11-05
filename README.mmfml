@@ -1,0 +1,13 @@
+                                   = Stocks =
+--------------------------------------------------------------------------------
+Stocks! Because I wanted to try writing a plugin that works in vim and neovim.
+
+== Setup
+    Create an api key with | https://finnhub.io |
+    Set the `g:stocks_api_key` variable to your key
+
+== Commands
+ :Stock .......                                Prints information about a stock
+ :StockRT ..... Writes information about a list of stocks to the current buffer
+                See `:help stock-rt` for more info
+                - [ ] Implement real time updates

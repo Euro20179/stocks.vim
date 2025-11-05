@@ -1,0 +1,4 @@
+:Stock	stocks.txt	/*:Stock*
+:StockRT	stocks.txt	/*:StockRT*
+stock-rt	stocks.txt	/*stock-rt*
+stocks.txt	stocks.txt	/*stocks.txt*
