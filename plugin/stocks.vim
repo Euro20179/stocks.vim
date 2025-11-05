@@ -6,7 +6,7 @@ function s:printStock(quotes)
     endfor
 endfun
 
-function s:updatestocks(output_start, data) abort
+function s:updatestocks(output_start, output_buf, data) abort
     let l:data = a:data
 
     "vim doesnt put it in a list, neovim does
@@ -14,29 +14,17 @@ function s:updatestocks(output_start, data) abort
         let l:data = [l:data]
     endif
 
-    "FIXME: this should work whether or not the user is currently in the
-    "buffer
-    if &filetype != "stock-rt" || l:data[0] == ""
+    if l:data[0] == ""
         return
     endif
-
-    let l:pos = getpos(".")
 
     let l:data = json_decode(l:data[0])
     let formatted_text_lines = stocks#format_data(l:data)
 
-    "go to the divider line
-    exec a:output_start
-    "store it
-    let line = getline(".")
-    "delete from the current line down
-    norm "_dG
-    "G moves cursor
-                                    "add back the divider line
-    call append(a:output_start - 1, [line] + formatted_text_lines)
-    exec a:output_start + 1 .. ',$sort f /(/'
+    let line = getbufline(a:output_buf, a:output_start)[0]
+    call deletebufline(a:output_buf, a:output_start, "$")
+    call appendbufline(a:output_buf, a:output_start - 1, [line] + formatted_text_lines)
 
-    call setpos(".", l:pos)
 endfun
 
 function s:realtime()
@@ -46,12 +34,14 @@ function s:realtime()
     set ft=stock-rt
 
     let [l:lnum, l:_] = searchpos("^-\\+$", "n")
+
     let l:output_start = l:lnum
+    let output_buf = bufnr()
 
     if has("nvim")
-        let l:job = jobstart(["python", s:lib_path .. "/realtime.py", json_encode(l:quotes), g:stocks_api_key], #{on_stdout: {j,data,_ -> s:updatestocks(l:output_start, data)}})
+        let l:job = jobstart(["python", s:lib_path .. "/realtime.py", json_encode(l:quotes), g:stocks_api_key], #{on_stdout: {j,data,_ -> s:updatestocks(l:output_start, output_buf, data)}})
     else
-        let l:job = job_start(["python", s:lib_path .. "/realtime.py", json_encode(l:quotes), g:stocks_api_key], #{out_cb: {j, data -> s:updatestocks(l:output_start, data)}})
+        let l:job = job_start(["python", s:lib_path .. "/realtime.py", json_encode(l:quotes), g:stocks_api_key], #{out_cb: {j, data -> s:updatestocks(l:output_start, output_buf, data)}})
     endif
 
     "call stocks#realtime(l:quotes, l:job)
