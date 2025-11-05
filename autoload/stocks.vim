@@ -1,15 +1,7 @@
 function stocks#listfrombuf() abort
     call setpos(".", [0, 0, 0, 0])
-    let l:temp = @a
-
-    "setup the / register for yn to copy from start until the ---- line
-    let @/ = "^-\\+$"
-    keepmarks keepjumps noau norm! "ayn
-    noh
-
-    let l:ret = @a
-    let @a = l:temp
-    let l:raw_stock_data = split(l:ret, "\n")
+    let [l:dividerLine, _] = searchpos('^-\+$', 'n')
+    let l:raw_stock_data = getline(0, l:dividerLine - 1)
 
     let l:stocks = {}
 
@@ -41,6 +33,10 @@ function stocks#printstock(quote)
     echohl Normal
 endfun
 
+function s:sortstocksDict(allStocks, stockA, stockB)
+    return a:allStocks[a:stockA] == a:allStocks[a:stockB] ? 0 : a:allStocks[a:stockA] < a:allStocks[a:stockB] ? 1 : -1
+endfun
+
 function stocks#format_data(data) abort
     let l:prices = a:data["prices"]
     let l:open = a:data["open"]
@@ -48,7 +44,7 @@ function stocks#format_data(data) abort
 
     let l:text = []
 
-    for l:stock in keys(l:prices)
+    for l:stock in sort(keys(l:moneychg), {a,b -> s:sortstocksDict(l:moneychg, a, b)})
         let l:price = l:prices[l:stock]
         let l:text += [printf("%s\t%.2f\t-\t%.2f\t(%.2f)", l:stock, l:price, l:price - str2float(l:open[l:stock]), l:moneychg[l:stock])]
     endfor
