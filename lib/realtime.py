@@ -20,6 +20,8 @@ prices = defaultdict(float)
 open = defaultdict(float)
 moneychg = defaultdict(float)
 
+stocklist = {k.upper(): v for k, v in stocklist.items()}
+
 for stock in stocklist:
     stockData = quote(stock)
     prices[stock] = float(stockData["c"])
@@ -35,7 +37,7 @@ print(data, flush=True)
 
 with connect(f"wss://ws.finnhub.io?token={key}") as socket:
     for symbol in stocklist:
-        socket.send(f'{{"type":"subscribe","symbol":"{symbol.upper()}"}}')
+        socket.send(f'{{"type":"subscribe","symbol":"{symbol}"}}')
     while True:
         msg = socket.recv()
         data = json.loads(msg)
