@@ -34,6 +34,7 @@ function s:updatestocks(output_start, data) abort
     "G moves cursor
                                     "add back the divider line
     call append(a:output_start - 1, [line] + formatted_text_lines)
+    exec a:output_start + 1 .. ',$sort f /(/'
 
     call setpos(".", l:pos)
 endfun
