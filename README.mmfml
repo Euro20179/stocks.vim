@@ -10,4 +10,4 @@ Stocks! Because I wanted to try writing a plugin that works in vim and neovim.
  :Stock .......                                Prints information about a stock
  :StockRT ..... Writes information about a list of stocks to the current buffer
                 See `:help stock-rt` for more info
-                - [ ] Implement real time updates
+                - [x] Implement real time updates
