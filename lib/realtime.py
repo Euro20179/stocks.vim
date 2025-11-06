@@ -31,7 +31,8 @@ for stock in stocklist:
 data = json.dumps({
     "prices": prices,
     "open": open,
-    "moneychg": moneychg
+    "moneychg": moneychg,
+    "shares": stocklist
 })
 print(data, flush=True)
 
@@ -47,13 +48,14 @@ with connect(f"wss://ws.finnhub.io?token={key}") as socket:
 
         stock = data["data"][0]["s"]
         prices[stock] = data["data"][0]["p"]
-        moneychg[stock] = open[stock] - prices[stock]
+        moneychg[stock] = (prices[stock] - open[stock]) * stocklist[stock]
         if data["type"] != "trade":
             continue
         data = json.dumps({
             "prices": prices,
             "open": open,
-            "moneychg": moneychg
+            "moneychg": moneychg,
+            "shares": stocklist
         })
 
         if not data: continue

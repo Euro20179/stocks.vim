@@ -41,13 +41,27 @@ function stocks#format_data(data) abort
     let l:prices = a:data["prices"]
     let l:open = a:data["open"]
     let l:moneychg = a:data["moneychg"]
+    let l:shares = a:data["shares"]
 
-    let l:text = []
+    let l:text = ["TICKER\tPRICE\tSHARES\tCHG\tDPROFIT"]
+
+    let moneyChgTotal = 0
+    let valueTotal = 0
 
     for l:stock in sort(keys(l:moneychg), {a,b -> s:sortstocksDict(l:moneychg, a, b)})
         let l:price = l:prices[l:stock]
-        let l:text += [printf("%s\t%.2f\t-\t%.2f\t(%.2f)", l:stock, l:price, l:price - str2float(l:open[l:stock]), l:moneychg[l:stock])]
+        let l:text += [printf("$%s\t%.2f\t%.3f\t%.2f\t(%.2f)", l:stock, l:price, l:shares[l:stock], l:price - str2float(l:open[l:stock]), l:moneychg[l:stock])]
+        let moneyChgTotal += l:moneychg[l:stock]
+        let valueTotal += l:shares[l:stock] * l:price
     endfor
+
+    let strVal = printf("%.2f", valueTotal)
+
+    let l:text += [
+                \ printf("--------------------"),
+                \ printf("%-15sDPROFIT", "VALUE"),
+                \ printf("%-*s(%.2f)", 15, strVal, moneyChgTotal)
+                \ ]
 
     return l:text
 endfun

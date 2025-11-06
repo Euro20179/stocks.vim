@@ -18,12 +18,22 @@ function s:updatestocks(output_start, output_buf, data) abort
         return
     endif
 
+    if bufnr() == a:output_buf
+        let l:startpos = getpos(".")
+    endif
+
     let l:data = json_decode(l:data[0])
     let formatted_text_lines = stocks#format_data(l:data)
 
     let line = getbufline(a:output_buf, a:output_start)[0]
     call deletebufline(a:output_buf, a:output_start, "$")
     call appendbufline(a:output_buf, a:output_start - 1, [line] + formatted_text_lines)
+
+    if bufnr() == a:output_buf
+        "set pos back to starting pos, i think deletebufline() moves the
+        "cursor if the cursor is within one of those lines
+        call setpos(".", l:startpos)
+    endif
 
 endfun
 
