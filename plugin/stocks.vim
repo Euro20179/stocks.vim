@@ -6,6 +6,8 @@ function s:printStock(quotes)
     endfor
 endfun
 
+let s:last_prices = {}
+
 function s:updatestocks(output_start, output_buf, data) abort
     let l:data = a:data
 
@@ -20,6 +22,41 @@ function s:updatestocks(output_start, output_buf, data) abort
 
     let l:data = json_decode(l:data[0])
     let formatted_text_lines = stocks#format_data(l:data)
+
+    let higherMatch = '^\$\('
+    let hasHigherMatch = v:false
+    let lowerMatch = '^\$\('
+    let hasLowerMatch = v:false
+    for stock in keys(s:last_prices)
+        let curPrice = l:data["prices"][stock]
+        let lastPrice = s:last_prices[stock]
+
+        if curPrice > lastPrice
+            let higherMatch ..= stock .. '\|'
+            let hasHigherMatch = v:true
+        elseif curPrice < lastPrice
+            let lowerMatch ..= stock .. '\|'
+            let hasLowerMatch = v:true
+        endif
+    endfor
+
+    if hasHigherMatch
+        "match up until the chg column
+        " :-3 removes the ending, invalid \|
+        let higherMatch = higherMatch[:-3] .. '\)\t[[:digit:].]\+\t[[:digit:].]\+'
+
+        exec 'match DiffAdd /' .. higherMatch .. '/'
+    endif
+
+    if hasLowerMatch
+        "match up until the chg column
+        " :-3 removes the ending, invalid \|
+        let lowerMatch = lowerMatch[:-3] .. '\)\t[[:digit:].]\+\t[[:digit:].]\+'
+
+        exec 'match DiffDelete /' .. lowerMatch .. '/'
+    endif
+
+    let s:last_prices = l:data["prices"]
 
     let line = getbufline(a:output_buf, a:output_start)[0]
     call setbufline(a:output_buf, a:output_start, [line] + formatted_text_lines)
