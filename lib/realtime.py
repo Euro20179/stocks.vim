@@ -46,11 +46,12 @@ with connect(f"wss://ws.finnhub.io?token={key}") as socket:
             socket.send(json.dumps({"type": "ping"}))
             continue
 
-        stock = data["data"][0]["s"]
-        prices[stock] = data["data"][0]["p"]
-        moneychg[stock] = (prices[stock] - open[stock]) * stocklist[stock]
-        if data["type"] != "trade":
-            continue
+        for datapoint in data["data"]:
+            stock = datapoint["s"]
+            prices[stock] = datapoint["p"]
+            moneychg[stock] = (prices[stock] - open[stock]) * stocklist[stock]
+            if data["type"] != "trade":
+                continue
         data = json.dumps({
             "prices": prices,
             "open": open,
