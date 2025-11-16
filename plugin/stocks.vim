@@ -1,6 +1,10 @@
 let s:lib_path = expand("<sfile>:p:h:h") .. "/lib"
 
 function s:printStock(quotes)
+    if stocks#ck_requirements() == v:false
+        return
+    endif
+
     for l:quote in a:quotes
         call stocks#printstock(l:quote)
     endfor
@@ -63,6 +67,10 @@ function s:updatestocks(output_start, output_buf, data) abort
 endfun
 
 function s:realtime()
+    if stocks#ck_requirements() == v:false
+        return
+    endif
+
     let l:quotes = stocks#listfrombuf()
 
     set buftype=nofile

@@ -65,3 +65,27 @@ function stocks#format_data(data) abort
 
     return l:text
 endfun
+
+let s:has_reqs = v:false
+
+function stocks#ck_requirements() abort
+    if s:has_reqs
+        return v:true
+    endif
+
+    let s:has_reqs = v:true
+python3 <<EOF
+try:
+    import requests
+except ModuleNotFoundError:
+    vim.command("let s:has_reqs = v:false")
+    vim.command('echohl Error | echom "[stocks.vim]: The python requests library is not installed" | echohl Normal')
+try:
+    import websockets
+except ModuleNotFoundError:
+    vim.command("let s:has_reqs = v:false")
+    vim.command('echohl Error | echom "[stocks.vim]: The python websockets library is not installed" | echohl Normal')
+EOF
+
+    return s:has_reqs
+endfun
