@@ -72,6 +72,10 @@ function s:realtime()
     endif
 
     let l:quotes = stocks#listfrombuf()
+    if len(l:quotes) < 1
+        echoerr "No quotes in buffer"
+        return
+    endif
 
     set buftype=nofile
     set ft=stock-rt
